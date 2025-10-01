@@ -27,11 +27,53 @@ interface InvoiceData {
   notes: string
 }
 
+interface Plan {
+  name: string
+  price: number
+  invoicesPerMonth: number
+  features: string[]
+}
+
+const plans: Plan[] = [
+  {
+    name: 'Free',
+    price: 0,
+    invoicesPerMonth: 3,
+    features: ['3 invoices per month', 'Basic templates', 'PDF export']
+  },
+  {
+    name: 'Pro',
+    price: 9.99,
+    invoicesPerMonth: 50,
+    features: ['50 invoices per month', 'Custom logo', 'Priority support', 'Advanced templates']
+  },
+  {
+    name: 'Business',
+    price: 19.99,
+    invoicesPerMonth: -1,
+    features: ['Unlimited invoices', 'Team collaboration', 'API access', 'White-label']
+  }
+]
+
+interface User {
+  email: string
+  name: string
+  plan: Plan
+  invoicesUsed: number
+  trialEndsAt?: Date
+}
+
 export default function FreelancerInvoiceAI() {
   const [currentStep, setCurrentStep] = useState(1)
   const [isGenerating, setIsGenerating] = useState(false)
   const [showPreview, setShowPreview] = useState(false)
   const [errors, setErrors] = useState<{[key: string]: string}>({})
+  const [currentPlan, setCurrentPlan] = useState<Plan>(plans[0])
+  const [invoicesUsed, setInvoicesUsed] = useState(0)
+  const [showPricing, setShowPricing] = useState(false)
+  const [user, setUser] = useState<User | null>(null)
+  const [showLogin, setShowLogin] = useState(false)
+  const [loginForm, setLoginForm] = useState({ email: '', password: '' })
   
   const [invoiceData, setInvoiceData] = useState<InvoiceData>({
     invoiceNumber: `INV-${Date.now()}`,
@@ -100,6 +142,39 @@ export default function FreelancerInvoiceAI() {
     }))
   }
 
+  const handleLogin = (email: string, password: string) => {
+    // Simulate login
+    const newUser: User = {
+      email,
+      name: email.split('@')[0],
+      plan: plans[0], // Start with free
+      invoicesUsed: 0
+    }
+    setUser(newUser)
+    setCurrentPlan(newUser.plan)
+    setInvoicesUsed(newUser.invoicesUsed)
+    setShowLogin(false)
+  }
+
+  const handleLogout = () => {
+    setUser(null)
+    setCurrentPlan(plans[0])
+    setInvoicesUsed(0)
+  }
+
+  const startFreeTrial = () => {
+    if (user) {
+      const trialUser = {
+        ...user,
+        plan: plans[1], // Pro plan
+        trialEndsAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days
+      }
+      setUser(trialUser)
+      setCurrentPlan(trialUser.plan)
+      setShowPricing(false)
+    }
+  }
+
   const generateInvoice = () => {
     setIsGenerating(true)
     calculateTotals()
@@ -124,11 +199,58 @@ export default function FreelancerInvoiceAI() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-12"
         >
-          <div className="flex items-center justify-center mb-4">
-            <Sparkles className="w-8 h-8 text-purple-400 mr-3" />
-            <h1 className="text-5xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-              AI Invoice Generator
-            </h1>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center">
+              <Sparkles className="w-8 h-8 text-purple-400 mr-3" />
+              <h1 className="text-5xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                AI Invoice Generator
+              </h1>
+            </div>
+            <div className="text-right">
+              {user ? (
+                <div className="bg-black/20 rounded-lg p-3 border border-purple-500/20">
+                  <p className="text-sm text-gray-300">Welcome, {user.name}</p>
+                  <p className="text-xs text-gray-400">
+                    {currentPlan.name} Plan {user.trialEndsAt && '(Trial)'}
+                  </p>
+                  <p className="text-xs text-gray-400">
+                    {currentPlan.invoicesPerMonth === -1 
+                      ? 'Unlimited invoices' 
+                      : `${invoicesUsed}/${currentPlan.invoicesPerMonth} invoices used`
+                    }
+                  </p>
+                  <div className="flex gap-2 mt-2">
+                    <button 
+                      onClick={() => setShowPricing(true)}
+                      className="text-xs text-purple-400 hover:text-purple-300"
+                    >
+                      Upgrade
+                    </button>
+                    <button 
+                      onClick={handleLogout}
+                      className="text-xs text-gray-400 hover:text-gray-300"
+                    >
+                      Logout
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <button 
+                    onClick={() => setShowLogin(true)}
+                    className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-semibold"
+                  >
+                    Login
+                  </button>
+                  <button 
+                    onClick={() => setShowLogin(true)}
+                    className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white px-4 py-2 rounded-lg text-sm font-semibold block w-full"
+                  >
+                    Start Free Trial
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
           <p className="text-xl text-gray-300">Professional invoices in seconds</p>
         </motion.div>
@@ -769,10 +891,31 @@ export default function FreelancerInvoiceAI() {
                     
                     {/* Download Button */}
                     <div className="bg-gray-50 p-6 text-center border-t no-print">
+                      {currentPlan.invoicesPerMonth !== -1 && invoicesUsed >= currentPlan.invoicesPerMonth && (
+                        <div className="mb-4 p-3 bg-red-100 border border-red-300 rounded-lg">
+                          <p className="text-red-700 text-sm font-semibold">
+                            You've reached your monthly limit of {currentPlan.invoicesPerMonth} invoices.
+                          </p>
+                          <p className="text-red-600 text-xs mt-1">
+                            Upgrade your plan to generate more invoices.
+                          </p>
+                        </div>
+                      )}
                       <motion.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
+                        whileHover={{ scale: currentPlan.invoicesPerMonth !== -1 && invoicesUsed >= currentPlan.invoicesPerMonth ? 1 : 1.05 }}
+                        whileTap={{ scale: currentPlan.invoicesPerMonth !== -1 && invoicesUsed >= currentPlan.invoicesPerMonth ? 1 : 0.95 }}
+                        disabled={currentPlan.invoicesPerMonth !== -1 && invoicesUsed >= currentPlan.invoicesPerMonth}
                         onClick={() => {
+                          if (!user) {
+                            setShowLogin(true)
+                            return
+                          }
+                          if (currentPlan.invoicesPerMonth !== -1 && invoicesUsed >= currentPlan.invoicesPerMonth) {
+                            setShowPricing(true)
+                            return
+                          }
+                          
+                          setInvoicesUsed(prev => prev + 1)
                           const invoiceContent = document.getElementById('invoice-content');
                           const newWindow = window.open('', '_blank');
                           
@@ -981,7 +1124,11 @@ export default function FreelancerInvoiceAI() {
                           newWindow.print();
                           newWindow.close();
                         }}
-                        className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold py-4 px-8 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg"
+                        className={`font-semibold py-4 px-8 rounded-xl transition-all duration-300 shadow-lg ${
+                          currentPlan.invoicesPerMonth !== -1 && invoicesUsed >= currentPlan.invoicesPerMonth
+                            ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
+                            : 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white transform hover:scale-105'
+                        }`}
                       >
                         <Download className="w-5 h-5 mr-2 inline" />
                         Download PDF
@@ -990,6 +1137,161 @@ export default function FreelancerInvoiceAI() {
                   </motion.div>
                 )}
               </AnimatePresence>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Pricing Modal */}
+        <AnimatePresence>
+          {showPricing && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+              onClick={() => setShowPricing(false)}
+            >
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.9, opacity: 0 }}
+                className="bg-gradient-to-br from-purple-900 to-pink-900 rounded-2xl p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="flex justify-between items-center mb-8">
+                  <h2 className="text-3xl font-bold text-white">Choose Your Plan</h2>
+                  <button
+                    onClick={() => setShowPricing(false)}
+                    className="text-gray-400 hover:text-white text-2xl"
+                  >
+                    ×
+                  </button>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {plans.map((plan, index) => (
+                    <motion.div
+                      key={plan.name}
+                      whileHover={{ scale: 1.05 }}
+                      className={`glass-purple rounded-xl p-6 border-2 ${
+                        currentPlan.name === plan.name 
+                          ? 'border-purple-400' 
+                          : 'border-purple-500/20'
+                      }`}
+                    >
+                      <div className="text-center mb-6">
+                        <h3 className="text-2xl font-bold text-white mb-2">{plan.name}</h3>
+                        <div className="text-4xl font-bold text-purple-400 mb-2">
+                          ${plan.price}
+                          <span className="text-lg text-gray-400">/month</span>
+                        </div>
+                      </div>
+                      
+                      <ul className="space-y-3 mb-6">
+                        {plan.features.map((feature, i) => (
+                          <li key={i} className="flex items-center text-gray-300">
+                            <div className="w-2 h-2 bg-purple-400 rounded-full mr-3"></div>
+                            {feature}
+                          </li>
+                        ))}
+                      </ul>
+                      
+                      <button
+                        onClick={() => {
+                          if (!user) {
+                            setShowLogin(true)
+                            return
+                          }
+                          if (plan.name === 'Pro' && !user.trialEndsAt) {
+                            startFreeTrial()
+                          } else {
+                            setCurrentPlan(plan)
+                            setShowPricing(false)
+                          }
+                        }}
+                        className={`w-full py-3 px-6 rounded-xl font-semibold transition-all ${
+                          currentPlan.name === plan.name
+                            ? 'bg-purple-600 text-white'
+                            : 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white'
+                        }`}
+                      >
+                        {!user ? 'Login Required' : 
+                         currentPlan.name === plan.name ? 'Current Plan' : 
+                         plan.name === 'Pro' && user && !user.trialEndsAt ? 'Start Free Trial' :
+                         'Select Plan'}
+                      </button>
+                    </motion.div>
+                  ))}
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Login Modal */}
+        <AnimatePresence>
+          {showLogin && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+              onClick={() => setShowLogin(false)}
+            >
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.9, opacity: 0 }}
+                className="bg-gradient-to-br from-purple-900 to-pink-900 rounded-2xl p-8 max-w-md w-full"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-2xl font-bold text-white">Login / Sign Up</h2>
+                  <button
+                    onClick={() => setShowLogin(false)}
+                    className="text-gray-400 hover:text-white text-2xl"
+                  >
+                    ×
+                  </button>
+                </div>
+                
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Email</label>
+                    <input
+                      type="email"
+                      placeholder="your@email.com"
+                      className="form-input w-full"
+                      value={loginForm.email}
+                      onChange={(e) => setLoginForm(prev => ({ ...prev, email: e.target.value }))}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Password</label>
+                    <input
+                      type="password"
+                      placeholder="••••••••"
+                      className="form-input w-full"
+                      value={loginForm.password}
+                      onChange={(e) => setLoginForm(prev => ({ ...prev, password: e.target.value }))}
+                    />
+                  </div>
+                  <button
+                    onClick={() => {
+                      if (loginForm.email && loginForm.password) {
+                        handleLogin(loginForm.email, loginForm.password)
+                        setLoginForm({ email: '', password: '' })
+                      }
+                    }}
+                    className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold py-3 px-6 rounded-xl transition-all"
+                  >
+                    Login / Sign Up
+                  </button>
+                  <p className="text-xs text-gray-400 text-center">
+                    Demo: Use any email/password to login
+                  </p>
+                </div>
+              </motion.div>
             </motion.div>
           )}
         </AnimatePresence>
