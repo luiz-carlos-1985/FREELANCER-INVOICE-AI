@@ -1,6 +1,6 @@
 # Freelancer Invoice AI
 
-A modern, professional invoice generator built with Next.js and TypeScript. Create beautiful invoices in seconds with an intuitive step-by-step interface.
+A modern, professional SaaS invoice generator built with Next.js and TypeScript. Create beautiful invoices in seconds with an intuitive step-by-step interface and flexible pricing plans.
 
 ## Features
 
@@ -29,6 +29,18 @@ A modern, professional invoice generator built with Next.js and TypeScript. Crea
 - Professional print layout
 - Optimized for A4 paper size
 - Company logo included in PDF
+
+### 🔐 Authentication & SaaS
+- User login and registration system
+- Multiple pricing tiers (Free, Pro, Business)
+- 7-day free trial for Pro plan
+- Usage tracking and limits
+- Subscription management
+
+### 💰 Pricing Plans
+- **Free**: 3 invoices/month, basic features
+- **Pro**: 50 invoices/month, custom logo, priority support
+- **Business**: Unlimited invoices, team collaboration, API access
 
 ## Tech Stack
 
@@ -73,10 +85,15 @@ npm run dev
 
 ## Usage
 
+### Getting Started
+1. **Sign Up/Login**: Create an account or login with any email/password (demo mode)
+2. **Choose Plan**: Start with Free plan or begin 7-day Pro trial
+3. **Create Invoice**: Follow the 3-step process below
+
 ### Step 1: Client & Freelancer Information
 - Enter client details (name, email, address)
 - Add your business information
-- Upload company logo (optional)
+- Upload company logo (Pro+ feature)
 - All fields are validated in real-time
 
 ### Step 2: Services & Items
@@ -88,22 +105,47 @@ npm run dev
 
 ### Step 3: Review & Generate
 - Preview your professional invoice
-- Download as PDF with one click
+- Download as PDF with one click (requires login)
 - Print-optimized layout
+- Usage tracking based on your plan
 
 ## Project Structure
 
 ```
 freelancer-invoice-ai/
 ├── pages/
-│   ├── _app.tsx          # App configuration
-│   └── index.tsx         # Main invoice generator
+│   ├── _app.tsx          # App configuration with favicon
+│   └── index.tsx         # Main SaaS invoice generator
 ├── globals.css           # Global styles and Tailwind
+├── favicon.svg           # SVG favicon with brand colors
 ├── next.config.js        # Next.js configuration
 ├── tailwind.config.js    # Tailwind CSS configuration
+├── postcss.config.js     # PostCSS configuration
 ├── tsconfig.json         # TypeScript configuration
+├── .gitignore           # Git ignore rules
 └── package.json          # Dependencies and scripts
 ```
+
+## SaaS Features
+
+### Authentication
+- Simple email/password login (demo mode)
+- User session management
+- Logout functionality
+- Protected PDF generation
+
+### Subscription Management
+- Free tier with 3 invoices/month
+- Pro trial (7 days) with 50 invoices/month
+- Business plan with unlimited invoices
+- Usage tracking and limit enforcement
+
+### Premium Features
+- Company logo upload (Pro+)
+- Priority support (Pro+)
+- Team collaboration (Business)
+- API access (Business)
+- White-label options (Business)
 
 ## Configuration
 
@@ -128,11 +170,26 @@ Default tax rate is 10%. To change it, modify the calculation in the `calculateT
 const tax = subtotal * 0.1 // Change 0.1 to your desired rate
 ```
 
+### Pricing Plans
+Modify the `plans` array in `pages/index.tsx` to adjust:
+- Plan names and prices
+- Invoice limits per plan
+- Feature lists
+- Trial duration
+
 ### Styling
 Customize colors and design by modifying:
 - `tailwind.config.js` for theme colors
 - `globals.css` for custom components
 - Component classes in `pages/index.tsx`
+- `favicon.svg` for brand icon
+
+### Authentication
+The current implementation uses demo authentication. For production:
+- Replace `handleLogin` with real authentication
+- Add password hashing and validation
+- Implement proper session management
+- Add password reset functionality
 
 ## Browser Support
 
@@ -140,6 +197,28 @@ Customize colors and design by modifying:
 - Firefox 88+
 - Safari 14+
 - Edge 90+
+
+## Demo Credentials
+
+For testing purposes, you can login with any email and password combination. The system will automatically create a demo user account.
+
+**Example:**
+- Email: `demo@example.com`
+- Password: `password123`
+
+## Deployment
+
+### Vercel (Recommended)
+```bash
+npm run build
+vercel --prod
+```
+
+### Other Platforms
+```bash
+npm run build
+npm run start
+```
 
 ## Contributing
 
@@ -156,6 +235,17 @@ This project is open source and available under the [MIT License](LICENSE).
 ## Support
 
 For support or questions, please open an issue in the repository.
+
+## Roadmap
+
+- [ ] Real authentication with database
+- [ ] Payment integration (Stripe)
+- [ ] Email invoice delivery
+- [ ] Invoice templates
+- [ ] Multi-language support
+- [ ] Team collaboration features
+- [ ] API for developers
+- [ ] Mobile app
 
 ## Screenshots:
 
