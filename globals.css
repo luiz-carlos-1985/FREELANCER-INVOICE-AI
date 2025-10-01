@@ -1,0 +1,50 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@layer base {
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  body {
+    @apply bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-900;
+  }
+}
+
+@layer components {
+  .glass-purple {
+    @apply bg-purple-500/10 backdrop-blur-lg border border-purple-500/20 shadow-xl;
+  }
+  
+  .invoice-paper {
+    @apply bg-white text-gray-900 shadow-2xl;
+  }
+  
+  .form-input {
+    @apply bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-purple-400 focus:ring-2 focus:ring-purple-400/20 transition-all duration-300;
+  }
+  
+  .btn-generate {
+    @apply bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold py-3 px-8 rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg;
+  }
+}
+
+@media print {
+  body {
+    @apply bg-white;
+  }
+  
+  #invoice-content {
+    @apply shadow-none;
+  }
+  
+  .no-print {
+    display: none !important;
+  }
+  
+  .print-break {
+    page-break-before: always;
+  }
+}
