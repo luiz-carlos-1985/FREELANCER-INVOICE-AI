@@ -1,4 +1,4 @@
-# Freelancer Invoice AI
+# Freelancer InvoicE
 
 A modern, professional SaaS invoice generator built with Next.js and TypeScript. Create beautiful invoices in seconds with an intuitive step-by-step interface and flexible pricing plans.
 
