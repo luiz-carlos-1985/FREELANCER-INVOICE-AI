@@ -156,3 +156,19 @@ This project is open source and available under the [MIT License](LICENSE).
 ## Support
 
 For support or questions, please open an issue in the repository.
+
+## Screenshots:
+
+<img width="1080" height="1047" alt="image" src="https://github.com/user-attachments/assets/0281729e-601a-4d1f-b513-a69f5f331885" />
+
+<img width="1113" height="991" alt="image" src="https://github.com/user-attachments/assets/0d24ff37-f75c-4d06-bb72-e00b607aa40a" />
+
+<img width="1049" height="1043" alt="image" src="https://github.com/user-attachments/assets/65b68a81-9fb2-4fd2-bd2a-3cbf2904123c" />
+
+<img width="1496" height="644" alt="image" src="https://github.com/user-attachments/assets/ff134b8a-5fbc-4e3b-950c-72332db61901" />
+
+<img width="1536" height="1044" alt="image" src="https://github.com/user-attachments/assets/de0a45a5-4a3e-441d-91b2-890f11e3e9e9" />
+
+
+
+
